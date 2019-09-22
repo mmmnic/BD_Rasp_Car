@@ -1,10 +1,11 @@
 import RPi.GPIO as GPIO
 from time import sleep
 
+# set GPIO mode
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-#define
+#define parameters
 servoFre = 50
 motorFre = 500
 servoCenterDutyCle = 7.5
@@ -32,7 +33,7 @@ Pin_BUZZER = 13
 Pin_SERVO = 19
 Pin_HEADLIGHT = 26
 
-#Setup pin
+#Setup pin as output or input
 GPIO.setup(Pin_MOTOR, GPIO.OUT)
 GPIO.setup(Pin_LED1, GPIO.OUT)
 GPIO.setup(Pin_LED2, GPIO.OUT)
@@ -43,36 +44,46 @@ GPIO.setup(Pin_HEADLIGHT, GPIO.OUT)
 GPIO.setup(Pin_BUT1, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(Pin_BUT2, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(Pin_BUT3, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(3, GPIO.OUT)
 
-#Setup for motor and servo
+#Setup PWM for motor and servo
 motor = GPIO.PWM(Pin_MOTOR, motorFre)
 servo = GPIO.PWM(Pin_SERVO, servoFre)
-testPWM = GPIO.PWM(3, 60)
-motor.start(0)
-servo.start(0)
-testPWM.start(0)
 
-GPIO.output(Pin_LED1, GPIO.HIGH)
-GPIO.output(Pin_LED2, GPIO.HIGH)
-GPIO.output(Pin_LED3, GPIO.HIGH)
-GPIO.output(Pin_BUZZER, GPIO.HIGH)
-GPIO.output(Pin_HEADLIGHT, GPIO.LOW)
 
-def LED1_on(Status):
+#Global function
+def setLED1(Status):
     GPIO.output(Pin_LED1, not(Status))
     return;
 
-def LED2_on(Status):
+def setLED2(Status):
     GPIO.output(Pin_LED2, not(Status))
     return;
 
-def LED3_on(Status):
+def setLED3(Status):
     GPIO.output(Pin_LED3, not(Status))
     return;
 
-def Buzzer_on(Status):
+def setBuzzer(Status):
     GPIO.output(Pin_BUZZER, not(Status))
+    return;
+
+def setHeadlight(Status):
+    GPIO.output(Pin_HEADLIGHT, Status)
+    return;
+
+def setSpeed(speed):
+    motor.ChangeDutyCycle(speed)
+    return;
+
+def setTurn(angle):
+    #limit turn angle
+    if (angle > servoMaxAngle):
+        angle = servoMaxAngle;
+    elif (angle < -servoMaxAngle):
+        angle = -servoMaxAngle;
+    #convert turn angle to duty cycle 
+    turnDutyCycle = servoCenterDutyCycle + angle*servoRatio 
+    servo.ChangeDutyCycle(turnDutyCycle)
     return;
 
 def isBut1():
@@ -93,3 +104,11 @@ def isBut3():
         return 1;
     return 0;
     
+#Set initial output signal (LEDs, Buzzer, Headlight is off
+setLED1(0)
+setLED2(0)
+setLED3(0)
+setBuzzer(0)
+setHeadlight(0)
+motor.start(0)
+servo.start(0)
