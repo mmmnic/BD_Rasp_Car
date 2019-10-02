@@ -88,19 +88,25 @@ def setTurn(angle):
 
 def isBut1():
     if not GPIO.input(Pin_BUT1):
+        setBuzzer(1)
         sleep(0.2)
+        setBuzzer(0)
         return 1;
     return 0;
 
 def isBut2():
     if not GPIO.input(Pin_BUT2):
+        setBuzzer(1)
         sleep(0.2)
+        setBuzzer(0)
         return 1;
     return 0;
 
 def isBut3():
     if not GPIO.input(Pin_BUT3):
+        setBuzzer(1)
         sleep(0.2)
+        setBuzzer(0)
         return 1;
     return 0;
     
