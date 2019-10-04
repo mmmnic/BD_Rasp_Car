@@ -1,4 +1,6 @@
 import RPi.GPIO as GPIO
+from picamera.array import PiRGBArray
+from picamera import PiCamera
 from time import sleep
 
 # set GPIO mode
@@ -110,7 +112,7 @@ def isBut3():
         return 1;
     return 0;
     
-#Set initial output signal (LEDs, Buzzer, Headlight is off
+#Set initial camera and output signal (LEDs, Buzzer, Headlight is off)
 setLED1(0)
 setLED2(0)
 setLED3(0)
@@ -118,3 +120,8 @@ setBuzzer(0)
 setHeadlight(0)
 motor.start(0)
 servo.start(0)
+
+camera = PiCamera()
+camera.resolution = (640, 480)
+camera.framerate = 32
+rawCapture = PiRGBArray(camera, size=(640, 480))
