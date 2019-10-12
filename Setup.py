@@ -9,11 +9,11 @@ GPIO.setwarnings(False)
 
 #define parameters
 servoFre = 50
-motorFre = 500
-servoCenterDutyCle = 7.5
+motorFre = 5000
+servoCenterDutyCycle = 7.5
 servoMaxDutyCycle = 10.5
 servoMaxAngle = 45
-servoRatio  = (servoMaxDutyCycle - servoCenterDutyCle)/servoMaxAngle
+servoRatio  = (servoMaxDutyCycle - servoCenterDutyCycle)/servoMaxAngle
 #5.5 max left
 #10.5 max right
 #7.5 center
