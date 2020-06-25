@@ -57,75 +57,91 @@ GPIO.setup(Pin_BUT3, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 motor = GPIO.PWM(Pin_MOTOR, motorFre)
 servo = GPIO.PWM(Pin_SERVO, servoFre)
 
-
 #Global function
 def setLED1(Status):
     GPIO.output(Pin_LED1, not(Status))
-    return;
+    return
 
 def setLED2(Status):
     GPIO.output(Pin_LED2, not(Status))
-    return;
+    return
 
 def setLED3(Status):
     GPIO.output(Pin_LED3, not(Status))
-    return;
+    return
 
 def setBuzzer(Status):
     GPIO.output(Pin_BUZZER, not(Status))
-    return;
+    return
 
 def setHeadlight(Status):
     GPIO.output(Pin_HEADLIGHT, Status)
-    return;
+    return
 
 def setSpeed(speed):
     motor.ChangeDutyCycle(speed)
-    return;
+    return
 
 def setTurn(angle):
     #limit turn angle
     if (angle > servoMaxAngle):
-        angle = servoMaxAngle;
+        angle = servoMaxAngle
     elif (angle < -servoMaxAngle):
-        angle = -servoMaxAngle;
+        angle = -servoMaxAngle
     #convert turn angle to duty cycle 
     turnDutyCycle = servoCenterDutyCycle + angle*servoRatio 
     servo.ChangeDutyCycle(turnDutyCycle)
-    return;
+    return
 
 def isBut1():
     if not GPIO.input(Pin_BUT1):
         setBuzzer(1)
         sleep(0.15)
         setBuzzer(0)
-        return 1;
-    return 0;
+        return 1
+    return 0
 
 def isBut2():
     if not GPIO.input(Pin_BUT2):
         setBuzzer(1)
         sleep(0.15)
         setBuzzer(0)
-        return 1;
-    return 0;
+        return 1
+    return 0
 
 def isBut3():
     if not GPIO.input(Pin_BUT3):
         setBuzzer(1)
         sleep(0.15)
         setBuzzer(0)
-        return 1;
-    return 0;
-    
-#Set initial camera and output signal (LEDs, Buzzer, Headlight is off)
-setLED1(0)
-setLED2(0)
-setLED3(0)
-setBuzzer(0)
-setHeadlight(0)
-motor.start(0)
-servo.start(0)
+        return 1
+    return 0
+
+# Calculate Angle
+def GetAngle(x, xshape = 160):
+    value = math.atan2((x-xshape), y)
+    result = value * 180 / math.pi
+    result = result * factor
+    new_result = (result / 30) * 2
+    setTurn(result)
+    print('setTurn: ', result)
+    return result
+
+# Calculate Speed
+def GetSpeed(angle):
+    speed = (abs(angle) / 45) * (100 - minsp)
+    setSpeed(speed)
+    return speed
+
+def setAllDeviceToZero():
+    setSpeed(0)
+    setTurn(0)
+    setLED1(0)
+    setLED2(0)
+    setLED3(0)
+    setBuzzer(0)
+    setHeadlight(0) 
+    return 0
 
 camera = PiCamera()
 camera.resolution = (640, 480)
