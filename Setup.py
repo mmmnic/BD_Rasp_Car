@@ -1,7 +1,13 @@
-import RPi.GPIO as GPIO
+import cv2
+import math
+import time
+import RPi.GPIO     as GPIO
+import numpy        as np
 from picamera.array import PiRGBArray
-from picamera import PiCamera
-from time import sleep
+from picamera       import PiCamera
+from picamera.array import PiRGBArray
+from picamera       import PiCamera
+from time           import sleep
 
 # set GPIO mode
 GPIO.setmode(GPIO.BCM)
@@ -125,3 +131,4 @@ camera = PiCamera()
 camera.resolution = (640, 480)
 camera.framerate = 32
 rawCapture = PiRGBArray(camera, size=(640, 480))
+sleep(1) #delay for hardware setup
