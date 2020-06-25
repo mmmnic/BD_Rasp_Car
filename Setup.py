@@ -8,7 +8,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
 #define parameters
-servoFre = 50
+servoFre = 48
 motorFre = 5000
 servoCenterDutyCycle = 7.5
 servoMaxDutyCycle = 10.5
