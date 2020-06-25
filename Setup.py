@@ -1,6 +1,6 @@
 import cv2
-import math
 import time
+import math
 import RPi.GPIO     as GPIO
 import numpy        as np
 from picamera.array import PiRGBArray
@@ -9,13 +9,19 @@ from picamera.array import PiRGBArray
 from picamera       import PiCamera
 from time           import sleep
 
+# --------------------- DATA THAT CAN CHANGEABLE --------------------- #
+y = 180
+factor = 2
+minsp = 0.2
+
+# --------------------- DO NOT CONFIG BELOW --------------------- #
 # set GPIO mode
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
 #define parameters
-servoFre = 48
-motorFre = 5000
+servoFre = 50
+motorFre = 120
 servoCenterDutyCycle = 7.5
 servoMaxDutyCycle = 10.5
 servoMaxAngle = 45
@@ -56,7 +62,8 @@ GPIO.setup(Pin_BUT3, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 #Setup PWM for motor and servo
 motor = GPIO.PWM(Pin_MOTOR, motorFre)
 servo = GPIO.PWM(Pin_SERVO, servoFre)
-
+motor.start(0)
+servo.start(servoCenterDutyCycle)
 #Global function
 def setLED1(Status):
     GPIO.output(Pin_LED1, not(Status))
@@ -79,6 +86,10 @@ def setHeadlight(Status):
     return
 
 def setSpeed(speed):
+    if speed >100:
+        speed = 100
+    elif speed<0:
+        speed = 0
     motor.ChangeDutyCycle(speed)
     return
 
@@ -117,22 +128,6 @@ def isBut3():
         return 1
     return 0
 
-# Calculate Angle
-def GetAngle(x, xshape = 160):
-    value = math.atan2((x-xshape), y)
-    result = value * 180 / math.pi
-    result = result * factor
-    new_result = (result / 30) * 2
-    setTurn(result)
-    print('setTurn: ', result)
-    return result
-
-# Calculate Speed
-def GetSpeed(angle):
-    speed = (abs(angle) / 45) * (100 - minsp)
-    setSpeed(speed)
-    return speed
-
 def setAllDeviceToZero():
     setSpeed(0)
     setTurn(0)
@@ -143,8 +138,22 @@ def setAllDeviceToZero():
     setHeadlight(0) 
     return 0
 
+# Calculate Angle
+def GetAngle(x, xshape = 160):
+    value = math.atan2((x-xshape), y)
+    result = value * 180 / math.pi
+    result = result * factor
+    new_result = (result / 30) * 2
+    return result
+
+# Calculate Speed
+def GetSpeed(angle):
+    speed = (abs(angle) / 45) * (100 - minsp)
+    return speed
+
+setAllDeviceToZero()
 camera = PiCamera()
 camera.resolution = (640, 480)
-camera.framerate = 32
+camera.framerate = 25
 rawCapture = PiRGBArray(camera, size=(640, 480))
 sleep(1) #delay for hardware setup

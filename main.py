@@ -1,9 +1,5 @@
 from Setup import *
 
-y = 180
-factor = 1.5
-minsp = 0.75
-
 def nothing(x):
    pass
 
@@ -35,7 +31,6 @@ def process(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     white_mask = cv2.inRange(hsv, lower, upper)
     result = cv2.bitwise_and(frame, frame, mask = white_mask)
-    #cv2.imshow('InRange', result)
 
     ################ Detect lane #################
     gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
@@ -48,7 +43,7 @@ def process(frame):
     for contour in contours:
         area = cv2.contourArea(contour)
         print("area: ", area)
-        if area < 10000:
+        if area < 11000:
          continue
         cv2.drawContours(frame, contour, -1, (0, 255, 0), 3)
         M = cv2.moments(contour)
@@ -60,11 +55,14 @@ def process(frame):
         X = sum_cx / count
         cv2.circle(frame ,(int(X), 20), 10, (0,0,255), -1)
         angle = GetAngle(X)
+        speed = GetSpeed(angle)
+        
         print('Angle: ', angle)
-        GetSpeed(angle)
+        print('Speed: ', speed)
+        
+        setTurn(angle)
+        setSpeed(speed)
     cv2.imshow('contour', frame)
-
-
 
 # ------------------------------------------ MAIN ------------------------------------------ #
                     # --------------------- GUIDE --------------------- #
@@ -72,12 +70,14 @@ def process(frame):
                     # Press button 2 or ESC to stop running and wait for next button
                     # Press button 3 to stop program
 def main():
-    setAllDeviceToZero()
     print("Main")
     while(1):
+        setLED1(1)
+        setLED3(1)
         if isBut1():
-            setAllDeviceToZero()
-            cv2.destroyAllWindows()
+            setLED1(0)
+            setLED2(1)
+            setLED3(0)
             for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
                 image = frame.array
                 #User code start here
@@ -85,15 +85,18 @@ def main():
                 cv2.imshow("Frame", image)
                 #User code end
                 rawCapture.truncate(0)              # clear the stream in preparation for the next frame
+                cv2.waitKey(1)
                 # --------------------- Exit Program ---------------------
                 if isBut2():
-                   break
-                # IMPORTANT when compete remember to remove or comment 2 lines below to improve performance
-                if cv2.waitKey(1) == 27: #ESC key = 27
-                   break
+                    setAllDeviceToZero()
+                    cv2.destroyAllWindows()
+                    break
         if isBut3(): # Button 3 to stop program
             break
     setAllDeviceToZero()
     cv2.destroyAllWindows()
+    motor.stop()
+    servo.stop()
+    
 if __name__ == "__main__":
    main()
